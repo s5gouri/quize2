@@ -195,7 +195,7 @@ const departmentQuestions = {
       answer: 0,
     },
   ],
-  "Hotel Management": [
+  Hotel_Management: [
     {
       question: "What does ADR stand for?",
       options: [
@@ -297,7 +297,7 @@ const departmentQuestions = {
       answer: 0,
     },
   ],
-  "Hospital Management": [
+  Hospital_Management: [
     {
       question: "What does EMR stand for?",
       options: [
@@ -412,13 +412,42 @@ const QuizPage = ({ department }) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/quiz1", {
+      const response = await axios.post("http://localhost:5000/api/quiz", {
         topic: searchQuery,
       });
 
       // Check if questions are returned
       if (response.data && response.data.length > 0) {
-        setQuestions(response.data);
+        console.log("all--", response.data);
+        let arr1 = [];
+        const n = response.data.length;
+        for (let i = 6; i < n; i++) {
+          if (i % 6 === 0) {
+            let arr2 = {};
+            let a = 0;
+            for (let j = i; j < i + 6; j++) {
+              a += 1;
+              if (a === 1) {
+                arr2.question = response.data[j].question;
+              } else if (a === 2) {
+                let options = [];
+                for (let k = 0; k < 4; k++) {
+                  options.push(response.data[j + k].question);
+                }
+                arr2.options = options;
+              } else if (a === 6) {
+                arr2.answer = response.data[j].question;
+              } else if (j === 6) {
+                console.log("the main idex is -->", j);
+                console.log("the value of arr2 is -->", arr2);
+              }
+            }
+            arr1.push(arr2);
+          }
+        }
+        
+        setQuestions(arr1);
+        console.log("final---", arr1);
       } else {
         setQuestions(departmentQuestions[department] || fallbackQuestions);
       }
@@ -430,7 +459,7 @@ const QuizPage = ({ department }) => {
     }
     setIsLoading(false);
   };
-  console.log(questions)
+
   const handleAnswerClick = (optionIndex) => {
     if (optionIndex === questions[currentQuestionIndex].answer) {
       setScore(score + 1);
